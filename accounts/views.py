@@ -80,40 +80,7 @@ class VerifyOTP(APIView):
                     })
 
 
-                # if not user:
-                #     return Response({
-                #         'status' : 400,
-                #         'message' : 'Something went wrong',
-                #         'data' : 'Invalid email'
-                #     })
-
                 
-
-                # # Check if OTP is still valid
-                # if user.otp != otp and user.otp_expires_at < timezone.now()+ timezone.timedelta(minutes=5):
-                # # if user.otp!=otp:
-                #     return Response({
-                #         'status': 400,
-                #         'message': 'Wrong or expired OTP',
-                #         'data': None
-                #     })
-
-                # # Check if the user is already verified
-                # if user.is_verified:
-                #     return Response({
-                #         'status': 400,
-                #         'message': 'User is already verified',
-                #         'data': None
-                #     })
-
-                # user.is_verified = True
-                # user.save()
-
-                # return Response({
-                #     'status': 200,
-                #     'message': 'Account Verified',
-                #     'data': None,
-                # })
 
             return Response({
                 'status': 400,

@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .manager import UserManager
 from datetime import datetime
+from django.utils.crypto import get_random_string
 
 class User(AbstractUser):
     username= None
@@ -18,10 +19,10 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
-    # def save(self, *args, **kwargs):
-    #     if not self.username:
-    #         self.username = self.email
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+         if not self.username:
+             self.username = self.email
+         super().save(*args, **kwargs)
 
     def name(self):
         return self.first_name + '' + self.last_name
@@ -29,9 +30,9 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
     
-    # def save(self, *args, **kwargs):
-    #     if not self.username:
-    #         self.username = self.email
-    #     # if not self.pk:  
-    #     #     self.otp_code = get_random_string(length=6)  
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.email
+            if not self.pk:  
+             self.otp_code = get_random_string(length=6)  
+             super().save(*args, **kwargs)

@@ -1,66 +1,47 @@
-from rest_framework. decorators import api_view
+from django.http import JsonResponse
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import ParseError
-from .models import *
-from .serializer import *
+from rest_framework import status
 
-@api_view(['GET'])
-def get_todo(request):
-    response= {'status':200}
-    todo_objs = Todo.objects.all()
-    serializer = TodoSerializer (todo_objs , many = True)
-    response ['data'] = serializer.data
-    return Response (response)
+from .models import Task
+from .serializer import TaskSerializer
 
-@api_view(['POST'])
-def post_todo(request):
-    try:
-        data = request.data
-        serializer = TodoSerializer(data=data)
+class TaskListView(APIView):
+    def get(self, request):
+        tasks = Task.objects.all()
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            name = serializer.validated_data['name']
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class TaskDetailView(APIView):
+    def get(self, request, pk):
+        task = Task.objects.filter(pk=pk)
+        if not task.exists():
+            data = {"error": "Task does not exist."}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        serializer = TaskSerializer(task)
+        return Response(serializer.data)
+    
+    
+
+
+    def put(self, request, pk):
+        task = self.get_object(pk)
+        serializer = TaskSerializer(task, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            response = {'status': 200, 'data': serializer.data}
-            return Response(response)
-        else:
-            return Response(serializer.errors, status=400)
-    except ParseError as e:
-        return Response({'detail': str(e)}, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view (['PATCH'])
-def patch_todo(request):
-    response = {'status': 200}
-    data = request.data
-    try: 
-        obj = Todo.objects.get(id = data.get('id'))
-        serializers = TodoSerializer(obj , data = data , partial=True)
-        if serializers.is_valid():
-            serializers.save()
-            response['data'] = serializers.data
-            return Response(response)
-        
-        return Response(serializers.errors)
-    
-    except Exception as e:
-        print(e)
-
-    return Response({
-        'status': 400,
-        'message' : "invalid id"
-        })
-    
-@api_view (['DELETE'])
-def delete_todo(request):
-    response = {'status' : 200}
-    data = request.data
-    try:
-        obj = Todo.objects.get(id = data.get('id'))
-        obj.delete()
-        return Response({'status': 200 , 'message' : 'deleted id'})
-    
-    except Exception as e:
-        print (e)
-
-    return Response ({'status':400 , 'message' : 'invalid id'})
-        
-    
-
+    def delete(self, request, pk):
+        task = self.get_object(pk)
+        task.delete()
+        return Response({'success': True, 'message': 'Task deleted successfully'})

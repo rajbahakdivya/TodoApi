@@ -22,12 +22,8 @@ from todoapp.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("",include("todoapp.urls")),
-    path('register/' , RegisterAPI.as_view()),
-    path('verify/' , VerifyOTP.as_view()),
-    path('login/', LoginAPI.as_view()),
-    path('get-todo/' , get_todo),
-    path('post-todo/' , post_todo),
-    path('patch-todo/' , patch_todo),
-    path('delete-todo' , delete_todo),
+    path("",include ("accounts.urls")),
+    
+   
 
 ]

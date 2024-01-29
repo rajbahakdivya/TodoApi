@@ -1,7 +1,13 @@
-from rest_framework import fields, serializers
-from .models import Todo
+from rest_framework import serializers
+from .models import Task
 
-class TodoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Todo
-        fields = '__all__'
+class TaskSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+
+    def create(self, validated_data):
+        return Task.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.save()
+        return instance
