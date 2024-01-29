@@ -5,6 +5,8 @@ from .serializer import *
 from .emails import *
 
 from django.utils import timezone
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class RegisterAPI(APIView):
 
@@ -126,3 +128,63 @@ class VerifyOTP(APIView):
                 'message': 'Internal Server Error',
                 'data': None,
             })
+        
+
+class LoginAPI(APIView):
+
+    def post(self, request):
+        try:
+            data = request.data
+            user= User.objects.filter(email=data['email']).first()
+            if user:
+                return Response({
+                'status': 400,
+                'message': 'successfully logged in',
+            })
+
+            serializer = LoginSerializer(data=data)
+            if serializer.is_valid():
+                email = serializer.data['email']
+                password = serializer.data['password']
+                user = authenticate(request, email=email, password=password)
+
+                if user is None:
+                    return Response({
+                        'status': 400,
+                        'message': 'Invalid credentials',
+                        'data': {},
+                    })
+
+                if not user.is_verified:
+                    return Response({
+                        'status': 400,
+                        'message': 'Account is not verified',
+                        'data': {},
+                    })
+
+                
+
+                return Response({
+                    'status': 200,
+                    'message': 'Login successful',
+                    'data': {},
+                })
+
+            return Response({
+                'status': 400,
+                'message': 'Something went wrong',
+                'data': serializer.errors,
+            })
+
+        except Exception as e:
+            print(e)
+
+
+    def get(self, request):
+        return Response({
+            'status': 200,
+            'message': 'GET request handled',
+            'data': {},
+        })
+        
+
