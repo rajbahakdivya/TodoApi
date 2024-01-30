@@ -8,9 +8,23 @@ from .serializer import TaskSerializer
 
 class TaskListView(APIView):
     def get(self, request):
-        tasks = Task.objects.all()
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data)
+         tasks = Task.objects.all()
+         serializer = TaskSerializer(tasks, many=True)
+         return Response(serializer.data)
+        #     msg = {
+        #         "message" : "",
+        #         "data" : serializer.data
+
+        #     }
+            
+        #     return Response(msg, status= status.HTTP_200_OK)
+        # except Exception as e:
+        #     print(e)
+        #     msg={
+        #         'status' : 400,
+        #         "message" : "invalid data"
+        #     }
+        #     return Response(msg, status= status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
@@ -22,26 +36,30 @@ class TaskListView(APIView):
     
 
 class TaskDetailView(APIView):
+    
+    # def get(self, request, pk):
+    #     task = Task.get_object.filter(pk=pk)
+    #     if not task.exists():
+    #         data = {"error": "Task does not exist."}
+    #         return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    #     serializer = TaskSerializer(task)
+    #     return Response(serializer.data)  
     def get(self, request, pk):
-        task = Task.objects.filter(pk=pk)
-        if not task.exists():
-            data = {"error": "Task does not exist."}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        serializer = TaskSerializer(task)
-        return Response(serializer.data)
-    
-    
-
-
+         tasks = Task.objects.get(pk=pk)
+         serializer = TaskSerializer(tasks)
+         return Response(serializer.data)
+     
     def put(self, request, pk):
-        task = self.get_object(pk)
+        task = Task.objects.get(pk=pk)
         serializer = TaskSerializer(task, data=request.data)
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        task = self.get_object(pk)
+        task = Task.objects.get(id=pk) 
         task.delete()
+        # task.is_delete = True
         return Response({'success': True, 'message': 'Task deleted successfully'})
