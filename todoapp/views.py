@@ -5,26 +5,15 @@ from rest_framework import status
 
 from .models import Task
 from .serializer import TaskSerializer
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 class TaskListView(APIView):
     def get(self, request):
          tasks = Task.objects.all()
          serializer = TaskSerializer(tasks, many=True)
          return Response(serializer.data)
-        #     msg = {
-        #         "message" : "",
-        #         "data" : serializer.data
-
-        #     }
-            
-        #     return Response(msg, status= status.HTTP_200_OK)
-        # except Exception as e:
-        #     print(e)
-        #     msg={
-        #         'status' : 400,
-        #         "message" : "invalid data"
-        #     }
-        #     return Response(msg, status= status.HTTP_400_BAD_REQUEST)
+        
 
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
@@ -36,14 +25,10 @@ class TaskListView(APIView):
     
 
 class TaskDetailView(APIView):
-    
-    # def get(self, request, pk):
-    #     task = Task.get_object.filter(pk=pk)
-    #     if not task.exists():
-    #         data = {"error": "Task does not exist."}
-    #         return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-    #     serializer = TaskSerializer(task)
-    #     return Response(serializer.data)  
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+     
     def get(self, request, pk):
          tasks = Task.objects.get(pk=pk)
          serializer = TaskSerializer(tasks)
