@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from accounts.views import *
+from todoapp.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("",include("todoapp.urls")),
-    path('register/' , RegisterAPI.as_view()),
-    path('verify/' , VerifyOTP.as_view()),
+    path("",include ("accounts.urls")),
+    
+   
+
 ]
